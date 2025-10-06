@@ -22,22 +22,28 @@ saveButton?.addEventListener('click', async () => {
   }
 
   if (!Array.isArray(board.columns) || board.columns.length === 0) {
-    const column = { id: crypto.randomUUID(), name: 'Backlog' };
+    const column = {
+      id: crypto.randomUUID(),
+      name: 'Backlog',
+      cards: [],
+    };
     board.columns = [column];
   }
 
-  if (!Array.isArray(board.cards)) {
-    board.cards = [];
+  const [firstColumn] = board.columns;
+
+  if (!Array.isArray(firstColumn.cards)) {
+    firstColumn.cards = [];
   }
 
   const titleInput = document.getElementById('title');
   const title = titleInput?.value?.trim();
   const cardTitle = title?.length ? title : 'New task';
 
-  board.cards.push({
+  firstColumn.cards.push({
     id: crypto.randomUUID(),
     title: cardTitle,
-    columnId: board.columns[0].id,
+    description: '',
   });
 
   await saveState(state);
