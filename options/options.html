@@ -1,1 +1,152 @@
-<!doctype html><html><body><h2>Kanban Settings</h2><button id='export'>Export</button><input type='file' id='import' accept='application/json'><script type='module' src='options.js'></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Kanban Settings</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 32px;
+        background: #0f1115;
+        color: #e6e6e6;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+      }
+
+      main {
+        max-width: 520px;
+        width: 100%;
+        background: rgba(21, 24, 34, 0.92);
+        border: 1px solid #1f2330;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+      }
+
+      h1 {
+        margin: 0 0 24px;
+        font-size: 22px;
+      }
+
+      section + section {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #1f2330;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      button,
+      select,
+      input[type='file'] {
+        font: inherit;
+      }
+
+      button {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: none;
+        background: #2f80ed;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      button:hover {
+        background: #4d96f3;
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .inline-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .import-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: #b5bdd3;
+      }
+
+      .import-label input[type='file'] {
+        display: none;
+      }
+
+      select {
+        appearance: none;
+        background: #151822;
+        border: 1px solid #1f2330;
+        border-radius: 10px;
+        color: inherit;
+        padding: 10px 14px;
+        min-width: 160px;
+      }
+
+      .hint {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #9aa1b9;
+      }
+
+      #status {
+        margin-top: 24px;
+        min-height: 20px;
+        color: #9aa1b9;
+      }
+
+      #status.success {
+        color: #66d9a3;
+      }
+
+      #status.error {
+        color: #ff8a80;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Kanban Settings</h1>
+      <section>
+        <h2>Data management</h2>
+        <div class="inline-actions">
+          <button id="export" type="button">Export boards</button>
+          <label class="import-label">
+            <span>Import from file</span>
+            <input type="file" id="import" accept="application/json">
+          </label>
+        </div>
+        <p class="hint">Imported data is validated before it overwrites your existing boards.</p>
+      </section>
+      <section>
+        <h2>Theme</h2>
+        <label for="theme">Side panel theme</label>
+        <div class="inline-actions">
+          <select id="theme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="system">Match system</option>
+          </select>
+        </div>
+      </section>
+      <p id="status" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

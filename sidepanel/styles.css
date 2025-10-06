@@ -1,1 +1,221 @@
-:root{color-scheme:dark;}body{margin:0;font:14px system-ui;background:#0f1115;color:#e6e6e6}
+:root {
+  color-scheme: dark;
+  --background: #0f1115;
+  --surface: #151822;
+  --surface-elevated: #1d2130;
+  --surface-highlight: #2f80ed33;
+  --border: #1f2330;
+  --accent: #2f80ed;
+  --text: #e6e6e6;
+  --text-muted: #9aa1b9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font: 14px/1.5 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--background);
+  color: var(--text);
+}
+
+header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(15, 17, 21, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#search {
+  flex: 1;
+  min-width: 140px;
+  max-width: 320px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.25);
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #4d96f3;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+main#board {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  overflow-x: auto;
+  align-items: flex-start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 260px;
+  max-width: 280px;
+  max-height: calc(100vh - 120px);
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.column-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.column-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--surface-elevated);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  cursor: grab;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card.dragging {
+  opacity: 0.4;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.card-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-body {
+  margin: 0;
+  font-size: 13px;
+  color: #c9cedd;
+}
+
+.add-card {
+  margin: 0 16px 16px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.add-card:hover {
+  border-color: var(--accent);
+  color: #fff;
+  background: rgba(47, 128, 237, 0.08);
+}
+
+.empty-column {
+  padding: 20px 16px;
+  border-radius: 10px;
+  background: rgba(21, 24, 34, 0.8);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.empty-board,
+.empty-state {
+  margin: auto;
+  max-width: 320px;
+  padding: 32px;
+  border-radius: 16px;
+  background: rgba(21, 24, 34, 0.85);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.card-list.drop-target {
+  outline: 2px dashed var(--accent);
+  outline-offset: -8px;
+  background: rgba(47, 128, 237, 0.08);
+}
+
+mark {
+  background: var(--surface-highlight);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+  header {
+    flex-wrap: wrap;
+  }
+
+  #search {
+    flex-basis: 100%;
+  }
+}
