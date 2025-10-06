@@ -54,7 +54,10 @@ async function requestKanbanName() {
     return;
   }
 
-  const response = prompt('Name your Kanban board', activeBoard.name ?? '');
+  await ensureSidePanelVisible();
+
+  const defaultName = activeBoard.name?.trim() || 'Kanban';
+  const response = prompt('Name your Kanban board', defaultName);
   const name = response?.trim();
   awaitingInitialBoard = false;
   if (!name || name === activeBoard.name) {
@@ -71,4 +74,16 @@ async function requestKanbanName() {
     ...state,
     boards: nextBoards,
   });
+}
+
+async function ensureSidePanelVisible() {
+  if (!chrome.runtime?.sendMessage) {
+    return;
+  }
+
+  try {
+    await chrome.runtime.sendMessage({ type: 'kanban/ensure-side-panel-open' });
+  } catch (error) {
+    console.warn('Unable to ensure side panel is open.', error);
+  }
 }
