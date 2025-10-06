@@ -23,16 +23,16 @@ async function handleState(nextState) {
 renderBoard(state, { onState: handleState });
 
 if (awaitingInitialBoard) {
-  void requestKanbanName();
+  void ensureKanbanInitialized();
 }
 
 chrome.runtime?.onMessage.addListener((message) => {
   if (message?.type === 'kanban/request-name') {
-    void requestKanbanName();
+    void ensureKanbanInitialized();
   }
 });
 
-async function requestKanbanName() {
+async function ensureKanbanInitialized() {
   if (!state) {
     state = await initDefault();
     awaitingInitialBoard = true;
@@ -49,24 +49,24 @@ async function requestKanbanName() {
     state = seededState;
   }
 
+  await ensureSidePanelVisible();
+
   const activeBoard = state.boards.find((board) => board.id === state.activeBoardId) ?? state.boards[0];
   if (!activeBoard) {
+    awaitingInitialBoard = false;
     return;
   }
 
-  await ensureSidePanelVisible();
-
-  const defaultName = activeBoard.name?.trim() || 'Kanban';
-  const response = prompt('Name your Kanban board', defaultName);
-  const name = response?.trim();
+  const trimmedName = activeBoard.name?.trim() ?? '';
+  const effectiveName = trimmedName || 'Kanban';
   awaitingInitialBoard = false;
-  if (!name || name === activeBoard.name) {
+  if (effectiveName === activeBoard.name) {
     return;
   }
 
   const nextBoards = state.boards.map((board) => (
     board.id === activeBoard.id
-      ? { ...board, name }
+      ? { ...board, name: effectiveName }
       : board
   ));
 

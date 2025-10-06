@@ -3,7 +3,7 @@ const ALLOWED_THEMES = new Set(['dark', 'light', 'system']);
 
 const DEFAULT_BOARD = Object.freeze({
   id: 'board-default',
-  name: 'My Board',
+  name: 'Kanban',
   labels: [],
   columns: [
     {
@@ -156,7 +156,8 @@ function normalizeBoard(board, index, diagnostics, tracker) {
   }
 
   const nameSource = typeof board.name === 'string' ? board.name.trim() : '';
-  const name = nameSource || `Board ${index + 1}`;
+  const fallbackName = index === 0 ? 'Kanban' : `Board ${index + 1}`;
+  const name = nameSource || fallbackName;
   if (name !== board.name) {
     tracker.changed = true;
   }
