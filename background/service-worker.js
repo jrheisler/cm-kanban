@@ -73,6 +73,26 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   await chrome.storage.local.set({ [STORAGE_KEY]: state });
 });
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type !== 'kanban/ensure-side-panel-open') {
+    return undefined;
+  }
+
+  const windowId = sender?.tab?.windowId ?? sender?.windowId ?? chrome.windows?.WINDOW_ID_CURRENT;
+
+  (async () => {
+    if (windowId !== undefined) {
+      await openSidePanel(windowId);
+    }
+    sendResponse();
+  })().catch((error) => {
+    console.warn('Failed to ensure side panel is open.', error);
+    sendResponse();
+  });
+
+  return true;
+});
+
 async function loadKanbanState() {
   const stored = await chrome.storage.local.get(STORAGE_KEY);
   const state = stored[STORAGE_KEY];
