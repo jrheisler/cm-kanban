@@ -1,4 +1,4 @@
-import { STORAGE_KEY } from '../sidepanel/state.js';
+import { STORAGE_KEY, createDefaultState } from '../sidepanel/state.js';
 
 const KANBAN_ADD_ID = 'kanban-add';
 
@@ -120,35 +120,18 @@ async function openSidePanel(windowId) {
 
 async function requestKanbanName(windowId, { ensureVisible = true } = {}) {
   const targetWindowId = windowId ?? chrome.windows?.WINDOW_ID_CURRENT;
-  if (ensureVisible && targetWindowId !== undefined) {
+  const existingState = await loadKanbanState();
+
+  if (
+    targetWindowId !== undefined
+    && (ensureVisible || !existingState)
+  ) {
     await openSidePanel(targetWindowId);
   }
 
-  if (await hasKanban()) {
+  if (existingState) {
     return;
   }
 
-  const requested = await sendMessageWithRetry({ type: 'kanban/request-name' });
-  if (!requested) {
-    console.warn('Unable to request Kanban name after multiple attempts.');
-  }
-}
-
-async function sendMessageWithRetry(message, { attempts = 5, delayMs = 200 } = {}) {
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    try {
-      await chrome.runtime.sendMessage(message);
-      return true;
-    } catch (error) {
-      const isLastAttempt = attempt === attempts - 1;
-      if (isLastAttempt) {
-        console.warn('Failed to deliver message to side panel.', error);
-        return false;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-  }
-
-  return false;
+  await chrome.storage.local.set({ [STORAGE_KEY]: createDefaultState() });
 }
