@@ -1,1 +1,117 @@
-chrome.runtime.onInstalled.addListener(()=>chrome.contextMenus.create({id:'kanban-add',title:'Add to Kanban',contexts:['selection','page']}));chrome.contextMenus.onClicked.addListener(async(info,tab)=>{if(info.menuItemId!=='kanban-add')return;const s=(await chrome.storage.local.get('kanban.v1'))['kanban.v1'];if(!s)return;const b=s.boards.find(x=>x.id===s.activeBoardId);b.cards.push({id:crypto.randomUUID(),title:info.selectionText||tab.title,columnId:b.columns[0].id});await chrome.storage.local.set({'kanban.v1':s});});
+import { STORAGE_KEY } from '../sidepanel/state.js';
+
+const KANBAN_ADD_ID = 'kanban-add';
+
+chrome.runtime.onInstalled.addListener(async () => {
+  chrome.contextMenus.create({
+    id: KANBAN_ADD_ID,
+    title: 'Add to Kanban',
+    contexts: ['selection', 'page'],
+  });
+
+  if (chrome.sidePanel?.setPanelBehavior) {
+    try {
+      await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+    } catch (error) {
+      console.error('Failed to configure side panel behavior.', error);
+    }
+  }
+});
+
+chrome.commands?.onCommand.addListener(async (command) => {
+  if (command !== 'open_side_panel') {
+    return;
+  }
+
+  const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  const targetWindowId = activeTab?.windowId ?? chrome.windows?.WINDOW_ID_CURRENT;
+  if (targetWindowId !== undefined) {
+    await openSidePanel(targetWindowId);
+  }
+
+  await requestKanbanName(targetWindowId, { ensureVisible: false });
+});
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== KANBAN_ADD_ID) {
+    return;
+  }
+
+  const state = await loadKanbanState();
+  if (!state) {
+    await requestKanbanName(tab?.windowId);
+    return;
+  }
+
+  const board = state.boards.find((candidate) => candidate.id === state.activeBoardId) ?? state.boards[0];
+  if (!board) {
+    await requestKanbanName(tab?.windowId);
+    return;
+  }
+
+  if (!Array.isArray(board.columns) || board.columns.length === 0) {
+    console.warn('Active board is missing columns; cannot add card from context menu.');
+    return;
+  }
+
+  const [firstColumn] = board.columns;
+  if (!firstColumn) {
+    console.warn('No available column found for the active board.');
+    return;
+  }
+
+  if (!Array.isArray(firstColumn.cards)) {
+    firstColumn.cards = [];
+  }
+
+  firstColumn.cards.push({
+    id: crypto.randomUUID(),
+    title: info.selectionText || info.linkUrl || tab?.title || 'New card',
+    description: '',
+  });
+
+  await chrome.storage.local.set({ [STORAGE_KEY]: state });
+});
+
+async function loadKanbanState() {
+  const stored = await chrome.storage.local.get(STORAGE_KEY);
+  const state = stored[STORAGE_KEY];
+  if (!state || !Array.isArray(state.boards) || state.boards.length === 0) {
+    return null;
+  }
+  return state;
+}
+
+async function hasKanban() {
+  const state = await loadKanbanState();
+  return Boolean(state);
+}
+
+async function openSidePanel(windowId) {
+  if (!chrome.sidePanel?.open) {
+    return;
+  }
+  try {
+    await chrome.sidePanel.open({ windowId });
+  } catch (error) {
+    console.error('Failed to open side panel.', error);
+  }
+}
+
+async function requestKanbanName(windowId, { ensureVisible = true } = {}) {
+  const targetWindowId = windowId ?? chrome.windows?.WINDOW_ID_CURRENT;
+  if (ensureVisible && targetWindowId !== undefined) {
+    await openSidePanel(targetWindowId);
+  }
+
+  if (await hasKanban()) {
+    return;
+  }
+
+  try {
+    await chrome.runtime.sendMessage({ type: 'kanban/request-name' });
+  } catch (error) {
+    // It's possible the side panel hasn't loaded yet; surface the error for debugging only.
+    console.warn('Unable to request Kanban name.', error);
+  }
+}

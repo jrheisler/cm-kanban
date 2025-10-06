@@ -4,7 +4,7 @@
   "description": "Local-first Kanban board as a Chrome side panel.",
   "version": "0.1.0",
   "action": { "default_popup": "popup/popup.html", "default_title": "Quick add to Kanban" },
-  "permissions": ["storage", "contextMenus", "notifications"],
+  "permissions": ["storage", "contextMenus", "notifications", "tabs"],
   "side_panel": { "default_path": "sidepanel/index.html" },
   "background": { "service_worker": "background/service-worker.js", "type": "module" },
   "commands": { "open_side_panel": { "suggested_key": { "default": "Alt+K" }, "description": "Open Kanban Side Panel" } },
