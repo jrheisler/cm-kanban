@@ -128,10 +128,27 @@ async function requestKanbanName(windowId, { ensureVisible = true } = {}) {
     return;
   }
 
-  try {
-    await chrome.runtime.sendMessage({ type: 'kanban/request-name' });
-  } catch (error) {
-    // It's possible the side panel hasn't loaded yet; surface the error for debugging only.
-    console.warn('Unable to request Kanban name.', error);
+  const requested = await sendMessageWithRetry({ type: 'kanban/request-name' });
+  if (!requested) {
+    console.warn('Unable to request Kanban name after multiple attempts.');
   }
+}
+
+async function sendMessageWithRetry(message, { attempts = 5, delayMs = 200 } = {}) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await chrome.runtime.sendMessage(message);
+      return true;
+    } catch (error) {
+      const isLastAttempt = attempt === attempts - 1;
+      if (isLastAttempt) {
+        console.warn('Failed to deliver message to side panel.', error);
+        return false;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  return false;
 }
