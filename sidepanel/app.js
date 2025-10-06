@@ -1,0 +1,1 @@
+import {loadState,saveState,initDefault} from './state.js';import {renderBoard} from './board.js';let s=await loadState()||await initDefault();renderBoard(s,{onState:async(n)=>{s=n;await saveState(s);renderBoard(s,{onState})}});

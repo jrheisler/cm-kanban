@@ -1,0 +1,1 @@
+import {loadState,saveState} from '../sidepanel/state.js';document.getElementById('save').addEventListener('click',async()=>{const s=await loadState();const b=s.boards.find(x=>x.id===s.activeBoardId);b.cards.push({id:crypto.randomUUID(),title:document.getElementById('title').value||'New task',columnId:b.columns[0].id});await saveState(s);window.close();});

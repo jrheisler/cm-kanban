@@ -1,0 +1,1 @@
+const KEY='kanban.v1';document.getElementById('export').addEventListener('click',async()=>{const s=(await chrome.storage.local.get(KEY))[KEY];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(s,null,2)],{type:'application/json'}));a.download='kanban.json';a.click();});
