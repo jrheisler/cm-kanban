@@ -90,11 +90,34 @@ function bindColumnInteractions() {
   });
 
   boardEl.querySelectorAll('.card').forEach((card) => {
+    if (card.dataset.bound) {
+      return;
+    }
+
+    card.dataset.bound = 'true';
     card.addEventListener('dragstart', handleDragStart);
     card.addEventListener('dragend', handleDragEnd);
   });
 
+  boardEl.querySelectorAll('.card-delete').forEach((button) => {
+    if (button.dataset.bound) {
+      return;
+    }
+
+    button.dataset.bound = 'true';
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      handleDeleteCard(button.dataset.cardId);
+    });
+  });
+
   boardEl.querySelectorAll('.card-list').forEach((list) => {
+    if (list.dataset.bound) {
+      return;
+    }
+
+    list.dataset.bound = 'true';
     list.addEventListener('dragover', handleDragOver);
     list.addEventListener('drop', handleDrop);
   });
@@ -124,6 +147,34 @@ function handleAddCard(columnId) {
     columnId,
   });
 
+  onStateChange(nextState);
+}
+
+function handleDeleteCard(cardId) {
+  if (!currentState || !onStateChange || !cardId) {
+    return;
+  }
+
+  const confirmed = confirm('Delete this card?');
+
+  if (!confirmed) {
+    return;
+  }
+
+  const nextState = cloneState(currentState);
+  const board = nextState.boards.find((item) => item.id === nextState.activeBoardId);
+
+  if (!board) {
+    return;
+  }
+
+  const index = board.cards.findIndex((card) => card.id === cardId);
+
+  if (index === -1) {
+    return;
+  }
+
+  board.cards.splice(index, 1);
   onStateChange(nextState);
 }
 
@@ -198,6 +249,15 @@ function renderColumn(column, cards) {
 function renderCard(card) {
   return `
     <article class="card" draggable="true" data-card-id="${card.id}">
+      <button
+        class="card-delete"
+        type="button"
+        data-card-id="${card.id}"
+        aria-label="Delete card"
+        title="Delete card"
+      >
+        ×
+      </button>
       <div class="card-title">${escapeHtml(card.title)}</div>
     </article>
   `;
@@ -230,7 +290,7 @@ function escapeHtml(value) {
       '>': '&gt;',
       "'": '&#39;',
       '"': '&quot;',
-    })[char]
+    })[char],
   );
 }
 
