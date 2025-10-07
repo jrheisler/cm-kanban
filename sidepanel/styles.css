@@ -1,1 +1,136 @@
-:root{color-scheme:dark;}body{margin:0;font:14px system-ui;background:#0f1115;color:#e6e6e6}
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: 14px/1.4 system-ui;
+  background: #0f1115;
+  color: #e6e6e6;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #13161d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+header input {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: #0f1115;
+  color: inherit;
+  padding: 0.4rem 0.6rem;
+}
+
+header button {
+  border: none;
+  background: #3a82f7;
+  color: white;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+header button:hover {
+  background: #2d6dd1;
+}
+
+#board {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-x: auto;
+  align-items: flex-start;
+}
+
+.column {
+  background: #181c25;
+  border-radius: 12px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 140px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.col-head {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-list {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+
+.card {
+  background: #202632;
+  border-radius: 10px;
+  padding: 0.75rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:active {
+  cursor: grabbing;
+  transform: translateY(1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.card-title {
+  margin: 0;
+  font-weight: 500;
+}
+
+.add-card {
+  margin: 0 1rem 1rem;
+  padding: 0.5rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.add-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.empty {
+  margin: 0;
+  color: rgba(230, 230, 230, 0.65);
+  font-size: 0.85rem;
+}
+
+.card-list .empty {
+  padding: 0.25rem 0;
+}
