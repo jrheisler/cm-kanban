@@ -122,16 +122,44 @@ async function requestKanbanName(windowId, { ensureVisible = true } = {}) {
   const targetWindowId = windowId ?? chrome.windows?.WINDOW_ID_CURRENT;
   const existingState = await loadKanbanState();
 
-  if (
-    targetWindowId !== undefined
-    && (ensureVisible || !existingState)
-  ) {
-    await openSidePanel(targetWindowId);
-  }
-
   if (existingState) {
+    if (ensureVisible && targetWindowId !== undefined) {
+      await openSidePanel(targetWindowId);
+    }
     return;
   }
 
-  await chrome.storage.local.set({ [STORAGE_KEY]: createDefaultState() });
+  let resolvedWindowId = targetWindowId;
+  if (
+    resolvedWindowId === undefined
+    && ensureVisible
+    && chrome.windows?.getCurrent
+  ) {
+    try {
+      const currentWindow = await chrome.windows.getCurrent();
+      if (typeof currentWindow?.id === 'number') {
+        resolvedWindowId = currentWindow.id;
+      }
+    } catch (error) {
+      console.warn('Unable to determine current window for side panel.', error);
+    }
+  }
+
+  if (resolvedWindowId !== undefined) {
+    await openSidePanel(resolvedWindowId);
+  }
+
+  let initializedViaPanel = false;
+  if (chrome.runtime?.sendMessage) {
+    try {
+      await chrome.runtime.sendMessage({ type: 'kanban/request-name' });
+      initializedViaPanel = true;
+    } catch (error) {
+      console.warn('Unable to request Kanban name from side panel.', error);
+    }
+  }
+
+  if (!initializedViaPanel) {
+    await chrome.storage.local.set({ [STORAGE_KEY]: createDefaultState() });
+  }
 }
